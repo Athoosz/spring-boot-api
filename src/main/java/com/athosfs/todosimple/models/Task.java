@@ -26,6 +26,12 @@ public class Task {
   @JoinColumn(name = "user_id", nullable = false, updatable = false)
   private User user;
 
+  @Column(name = "title", length = 100, nullable = false)
+  @NotNull
+  @NotEmpty
+  @Size(min = 4, max = 100)
+  private String title;
+
   @Column(name = "description", length = 300, nullable = false)
   @NotNull
   @NotEmpty
@@ -34,9 +40,14 @@ public class Task {
 
   public Task() {}
 
-  public Task(Long id, User user, @NotNull @NotEmpty @Size(min = 4, max = 300) String description) {
+  public Task(
+      Long id,
+      User user,
+      @NotNull @NotEmpty @Size(min = 4, max = 100) String title,
+      @NotNull @NotEmpty @Size(min = 4, max = 300) String description) {
     this.id = id;
     this.user = user;
+    this.title = title;
     this.description = description;
   }
 
@@ -64,31 +75,11 @@ public class Task {
     this.description = description;
   }
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((id == null) ? 0 : id.hashCode());
-    result = prime * result + ((user == null) ? 0 : user.hashCode());
-    result = prime * result + ((description == null) ? 0 : description.hashCode());
-    return result;
+  public String getTitle() {
+    return title;
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    Task other = (Task) obj;
-    if (id == null) {
-      if (other.id != null) return false;
-    } else if (!id.equals(other.id)) return false;
-    if (user == null) {
-      if (other.user != null) return false;
-    } else if (!user.equals(other.user)) return false;
-    if (description == null) {
-      if (other.description != null) return false;
-    } else if (!description.equals(other.description)) return false;
-    return true;
+  public void setTitle(String title) {
+    this.title = title;
   }
 }
