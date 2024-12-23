@@ -2,6 +2,8 @@ package com.athosfs.todosimple.services;
 
 import com.athosfs.todosimple.models.*;
 import com.athosfs.todosimple.repositories.*;
+
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,11 @@ public class TaskService {
   public Task findById(Long id) {
     Optional<Task> task = this.taskRepository.findById(id);
     return task.orElseThrow(() -> new RuntimeException("Tarefa nao encontrada, Id: " + id));
+  }
+
+  public List<Task> findAllByUserId(Long userId) {
+    List<Task> tasks = this.taskRepository.findByUserId(userId);
+    return tasks;
   }
 
   @Transactional

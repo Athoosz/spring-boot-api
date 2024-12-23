@@ -1,5 +1,6 @@
 package com.athosfs.todosimple.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class User {
       max = 60)
   private String password;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "user") // um usuario tem varias tasks
   private List<Task> tasks = new ArrayList<>();
 
@@ -58,7 +60,7 @@ public class User {
   }
 
   public List<Task> getTasks() {
-    return tasks;
+    return this.tasks;
   }
 
   public void setTasks(List<Task> tasks) {
