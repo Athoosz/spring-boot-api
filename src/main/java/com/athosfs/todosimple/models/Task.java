@@ -11,9 +11,19 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = Task.TABLE_NAME)
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
 public class Task {
   public static final String TABLE_NAME = "task";
 
@@ -37,49 +47,4 @@ public class Task {
   @NotEmpty
   @Size(min = 4, max = 300)
   private String description;
-
-  public Task() {}
-
-  public Task(
-      Long id,
-      User user,
-      @NotNull @NotEmpty @Size(min = 4, max = 100) String title,
-      @NotNull @NotEmpty @Size(min = 4, max = 300) String description) {
-    this.id = id;
-    this.user = user;
-    this.title = title;
-    this.description = description;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public User getUser() {
-    return user;
-  }
-
-  public void setUser(User user) {
-    this.user = user;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    this.title = title;
-  }
 }
