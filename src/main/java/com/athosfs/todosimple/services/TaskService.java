@@ -2,6 +2,7 @@ package com.athosfs.todosimple.services;
 
 import com.athosfs.todosimple.models.*;
 import com.athosfs.todosimple.repositories.*;
+import com.athosfs.todosimple.services.exceptions.DataBindingViolationException;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +48,7 @@ public class TaskService {
     try {
       this.taskRepository.deleteById(id);
     } catch (Exception e) {
-      throw new RuntimeException("Tarefa nao pode ser deletada");
+      throw new DataBindingViolationException("Tarefa nao pode ser deletada");
     }
   }
 }

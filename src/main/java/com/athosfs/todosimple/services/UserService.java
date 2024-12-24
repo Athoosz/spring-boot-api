@@ -2,6 +2,8 @@ package com.athosfs.todosimple.services;
 
 import com.athosfs.todosimple.models.*;
 import com.athosfs.todosimple.repositories.*;
+import com.athosfs.todosimple.services.exceptions.DataBindingViolationException;
+import com.athosfs.todosimple.services.exceptions.ObjectNotFoundException;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +20,7 @@ public class UserService {
 
   public User findById(Long id) {
     Optional<User> user = this.userRepository.findById(id);
-    return user.orElseThrow(() -> new RuntimeException("Usuario nao encontrado, Id: " + id));
+    return user.orElseThrow(() -> new ObjectNotFoundException("Usuario nao encontrado, Id: " + id));
   }
 
   @Transactional
@@ -27,7 +29,7 @@ public class UserService {
     obj = this.userRepository.save(obj);
     return obj;
   }
-  
+
   @Transactional
   public User update(User obj) {
     User newObj = this.findById(obj.getId());
@@ -37,14 +39,11 @@ public class UserService {
 
   @Transactional
   public void delete(Long id) {
-    this.findById(id);                            
-    try{
+    this.findById(id);
+    try {
       this.userRepository.deleteById(id);
-    }
-    catch(Exception e){
-      throw new RuntimeException("Usuario possui tarefas associadas, nao pode ser deletado");
+    } catch (Exception e) {
+      throw new DataBindingViolationException("Usuario possui tarefas associadas, nao pode ser deletado");
     }
   }
-
-
 }
