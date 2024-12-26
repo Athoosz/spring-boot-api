@@ -3,13 +3,16 @@ package com.athosfs.todosimple.services;
 import com.athosfs.todosimple.models.*;
 import com.athosfs.todosimple.models.enums.ProfileEnum;
 import com.athosfs.todosimple.repositories.*;
+import com.athosfs.todosimple.security.UserSpringSecurity;
+import com.athosfs.todosimple.services.exceptions.AuthorizationException;
 import com.athosfs.todosimple.services.exceptions.DataBindingViolationException;
 import com.athosfs.todosimple.services.exceptions.ObjectNotFoundException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +29,11 @@ public class UserService {
   }
 
   public User findById(Long id) {
+    UserSpringSecurity userSpringSecurity = authenticated();
+    if (Objects.nonNull(userSpringSecurity) && !userSpringSecurity.hasRole(ProfileEnum.ADMIN)
+        && !id.equals(userSpringSecurity.getId())) {
+      throw new AuthorizationException("Acesso negado");
+    }
     Optional<User> user = this.userRepository.findById(id);
     return user.orElseThrow(() -> new ObjectNotFoundException("Usuario nao encontrado, Id: " + id));
   }
@@ -53,7 +61,17 @@ public class UserService {
     try {
       this.userRepository.deleteById(id);
     } catch (Exception e) {
-      throw new DataBindingViolationException("Usuario possui tarefas associadas, nao pode ser deletado");
+      throw new DataBindingViolationException(
+          "Usuario possui tarefas associadas, nao pode ser deletado");
+    }
+  }
+
+  public static UserSpringSecurity authenticated() {
+    try {
+      return (UserSpringSecurity)
+          SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    } catch (Exception e) {
+      return null;
     }
   }
 }
