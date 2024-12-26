@@ -2,6 +2,10 @@ package com.athosfs.todosimple.exceptions;
 
 import com.athosfs.todosimple.services.exceptions.DataBindingViolationException;
 import com.athosfs.todosimple.services.exceptions.ObjectNotFoundException;
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -10,6 +14,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,7 +26,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @Slf4j(topic = "GlobalExceptionHandler")
 @RestControllerAdvice
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler
+    implements AuthenticationFailureHandler {
 
   @Value("${server.error.include-exception}")
   private boolean printStackTrace;
@@ -82,16 +89,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(DataBindingViolationException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<Object> handleDataBindingViolationException(
-            DataBindingViolationException dataBindingViolationException,
-            WebRequest request) {
-        log.error("Falha ao salvar entidade com dados associados", dataBindingViolationException);
-        return buildErrorResponse(
-                dataBindingViolationException,
-                HttpStatus.CONFLICT,
-                request);
-    }
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public ResponseEntity<Object> handleDataBindingViolationException(
+      DataBindingViolationException dataBindingViolationException, WebRequest request) {
+    log.error("Falha ao salvar entidade com dados associados", dataBindingViolationException);
+    return buildErrorResponse(dataBindingViolationException, HttpStatus.CONFLICT, request);
+  }
 
   private ResponseEntity<Object> buildErrorResponse(
       Exception exception, HttpStatus httpStatus, WebRequest request) {
@@ -105,5 +108,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
       errorResponse.setStackTrace(ExceptionUtils.getStackTrace(exception));
     }
     return ResponseEntity.status(httpStatus).body(errorResponse);
+  }
+
+  @Override
+  public void onAuthenticationFailure(
+      HttpServletRequest request, HttpServletResponse response, AuthenticationException exception)
+      throws IOException, ServletException {
+    Integer status = HttpStatus.UNAUTHORIZED.value();
+    response.setStatus(status);
+    response.setContentType("application/json");
+    ErrorResponse errorResponse = new ErrorResponse(status, "username ou password invalida");
+    response.getWriter().append(errorResponse.toJson());
   }
 }
