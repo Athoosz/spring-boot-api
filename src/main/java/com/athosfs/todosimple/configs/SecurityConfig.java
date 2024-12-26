@@ -1,10 +1,9 @@
 package com.athosfs.todosimple.configs;
 
 import com.athosfs.todosimple.security.JWTAuthenticationFilter;
+import com.athosfs.todosimple.security.JWTAuthorizationFilter;
 import com.athosfs.todosimple.security.JWTUtil;
 import java.util.Arrays;
-
-import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,9 +53,13 @@ public class SecurityConfig {
         .antMatchers(PUBLIC_MATCHERS)
         .permitAll()
         .anyRequest()
-        .authenticated().and().authenticationManager(authenticationManager);
+        .authenticated()
+        .and()
+        .authenticationManager(authenticationManager);
 
     http.addFilter(new JWTAuthenticationFilter(authenticationManager, jwtUtil));
+    http.addFilter(
+        new JWTAuthorizationFilter(authenticationManager, jwtUtil, this.userDetailsService));
 
     http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
