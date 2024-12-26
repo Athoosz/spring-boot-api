@@ -1,13 +1,11 @@
 package com.athosfs.todosimple.controllers;
 
 import com.athosfs.todosimple.models.User;
-import com.athosfs.todosimple.models.User.CreateUser;
+import com.athosfs.todosimple.models.dto.UserCreateDTO;
+import com.athosfs.todosimple.models.dto.UserUpdateDTO;
 import com.athosfs.todosimple.services.UserService;
-
 import java.net.URI;
-
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -26,8 +24,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @Validated
 public class UserController {
 
-  @Autowired
-  private UserService userService;
+  @Autowired private UserService userService;
 
   @GetMapping("/{id}")
   public ResponseEntity<User> findById(@PathVariable Long id) {
@@ -37,17 +34,22 @@ public class UserController {
 
   // http://localhost:8080/user
   @PostMapping
-  @Validated(CreateUser.class)
-  public ResponseEntity<Void> create(@Valid @RequestBody User obj) {
-    obj = this.userService.create(obj);
-    URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
+  public ResponseEntity<Void> create(@Valid @RequestBody UserCreateDTO obj) {
+    User user = this.userService.fromDTO(obj);
+    User newUser = this.userService.create(user);
+    URI uri =
+        ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(newUser.getId())
+            .toUri();
     return ResponseEntity.created(uri).build();
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Void> update(@Valid @RequestBody User obj, @PathVariable Long id) {
+  public ResponseEntity<Void> update(@Valid @RequestBody UserUpdateDTO obj, @PathVariable Long id) {
     obj.setId(id);
-    this.userService.update(obj);
+    User user = this.userService.fromDTO(obj);
+    this.userService.update(user);
     return ResponseEntity.noContent().build();
   }
 
@@ -56,7 +58,4 @@ public class UserController {
     this.userService.delete(id);
     return ResponseEntity.noContent().build();
   }
-
-
-
 }

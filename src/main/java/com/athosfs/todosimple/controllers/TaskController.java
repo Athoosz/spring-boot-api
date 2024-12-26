@@ -1,6 +1,7 @@
 package com.athosfs.todosimple.controllers;
 
 import com.athosfs.todosimple.models.Task;
+import com.athosfs.todosimple.models.projection.TaskProjection;
 import com.athosfs.todosimple.services.TaskService;
 import com.athosfs.todosimple.services.UserService;
 import java.net.URI;
@@ -34,8 +35,8 @@ public class TaskController {
   }
 
   @GetMapping("/user")
-  public ResponseEntity<List<Task>> findAllByUser() {
-    List<Task> objs = this.taskService.findAllByUser();
+  public ResponseEntity<List<TaskProjection>> findAllByUser() {
+    List<TaskProjection> objs = this.taskService.findAllByUser();
     return ResponseEntity.ok().body(objs);
   }
 

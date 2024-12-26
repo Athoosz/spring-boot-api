@@ -1,6 +1,8 @@
 package com.athosfs.todosimple.services;
 
 import com.athosfs.todosimple.models.*;
+import com.athosfs.todosimple.models.dto.UserCreateDTO;
+import com.athosfs.todosimple.models.dto.UserUpdateDTO;
 import com.athosfs.todosimple.models.enums.ProfileEnum;
 import com.athosfs.todosimple.repositories.*;
 import com.athosfs.todosimple.security.UserSpringSecurity;
@@ -11,6 +13,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -68,10 +73,24 @@ public class UserService {
 
   public static UserSpringSecurity authenticated() {
     try {
-      return (UserSpringSecurity)
-          SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      return (UserSpringSecurity) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     } catch (Exception e) {
       return null;
     }
   }
+  
+   public User fromDTO(@Valid UserCreateDTO obj) {
+        User user = new User();
+        user.setUsername(obj.getUsername());
+        user.setPassword(obj.getPassword());
+        return user;
+    }
+
+    public User fromDTO(@Valid UserUpdateDTO obj) {
+        User user = new User();
+        user.setId(obj.getId());
+        user.setPassword(obj.getPassword());
+        return user;
+    }
+
 }

@@ -2,6 +2,7 @@ package com.athosfs.todosimple.services;
 
 import com.athosfs.todosimple.models.*;
 import com.athosfs.todosimple.models.enums.ProfileEnum;
+import com.athosfs.todosimple.models.projection.TaskProjection;
 import com.athosfs.todosimple.repositories.*;
 import com.athosfs.todosimple.security.UserSpringSecurity;
 import com.athosfs.todosimple.services.exceptions.AuthorizationException;
@@ -31,11 +32,11 @@ public class TaskService {
     return task;
   }
 
-  public List<Task> findAllByUser() {
+  public List<TaskProjection> findAllByUser() {
     UserSpringSecurity userSpringSecurity = UserService.authenticated();
     if (Objects.isNull(userSpringSecurity)) throw new AuthorizationException("Acesso negado");
 
-    List<Task> tasks = this.taskRepository.findByUserId(userSpringSecurity.getId());
+    List<TaskProjection> tasks = this.taskRepository.findByUserId(userSpringSecurity.getId());
     return tasks;
   }
 
@@ -65,7 +66,7 @@ public class TaskService {
     try {
       this.taskRepository.deleteById(id);
     } catch (Exception e) {
-      throw new DataBindingViolationException("Tarefa nao pode ser deletada");
+      throw new DataBindingViolationException("Não é possível excluir pois há entidades relacionadas!");
     }
   }
 
